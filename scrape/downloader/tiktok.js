@@ -1,0 +1,45 @@
+import axios from "axios";
+
+export default async function tiktok(query) {
+  try {
+    const encodedParams = new URLSearchParams();
+    encodedParams.set("url", query);
+    encodedParams.set("hd", "1");
+
+    const response = await axios({
+      method: "POST",
+      url: "https://tikwm.com/api/",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Cookie: "current_language=en",
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36",
+      },
+      data: encodedParams,
+    });
+
+    const videos = response.data.data;
+
+    return {
+      title: videos.title,
+      cover: videos.cover,
+      origin_cover: videos.origin_cover,
+      no_watermark: videos.hdplay || videos.play,
+      watermark: videos.wmplay,
+      music: {
+        title: videos.music_info?.title || videos.music || "Unknown",
+        author: videos.music_info?.author || "Unknown",
+        play: videos.music,
+        cover: videos.music_info?.cover || videos.cover
+      },
+      images: videos.images,
+      duration: videos.duration,
+      play_count: videos.play_count,
+      digg_count: videos.digg_count,
+      comment_count: videos.comment_count,
+      share_count: videos.share_count
+    };
+  } catch (error) {
+    throw error;
+  }
+}
